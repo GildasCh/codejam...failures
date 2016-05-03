@@ -1,0 +1,82 @@
+*2*
+
+              G                   G
+         G         G         G         G
+       G   G     G   G     G   G     G   G
+      G G G G   G G G G   G G G G   G G G G
+
+              G                   L
+         G         G         G         L
+       G   G     G   G     G   G     G   L
+      G G G G   G G G G   G G G G   G G G L
+
+              L                   G
+         L         G         G         G
+       L   G     G   G     G   G     G   G
+      L G G G 
+
+               L                     L
+         L         L         L         L
+      L   L   L   L   L   L   L   
+
+*3*
+
+
+GGG
+GGGGGGGGG
+
+
+GLG
+GGGGLGGGG
+
+LGG
+LGGGGGGGG
+
+LLG
+LLGLLGGGG
+
+GGL
+GGGGGGGGL
+
+GLL
+GGGGLLGLL
+
+LGL
+LGLGGGLGL
+
+LLL
+LLLLLLLLL
+
+*3bis*
+
+GGG
+GGGGGGGGG
+-GGGGGGGGGGGGGGGG...
+
+GLG
+GGGGLGGGG
+-GGGGGGGGGGGGGLGGGGGGGGGGGGG
+
+LGG
+LGGGGGGGG
+-LGGGGGGGGGGGGGGGGGG
+
+LLG
+LLGLLGGGG
+-LLGLLGGGGLLGLLGGGGGGGGG
+
+GGL
+GGGGGGGGL
+GGGGGGGGGG...GGGGL
+
+GLL
+GGGGLLGLL
+GGGGGGGGGGGGGLLGLLGGGGLLGLL
+
+LGL
+LGGG
+LGGGGGGG
+
+LLL
+LLLL
+LLLLLLLL

@@ -1,4 +1,42 @@
 from codejam import CodeJam, parsers
+import sys, traceback
+
+def getSs(jpList, dj, dp, overall, s, k):
+  if len(jpList) == 0:
+    return True, []
+
+  head, *tail = jpList
+  cj, cp = head
+
+  for a in range(0, s):
+    # if not dj.get((cj, a), 0) < k:
+    #   print("%d,%d already taken" % (cj, a))
+    # elif not dp.get((cp, a), 0) < k:
+    #   print("%d,%d already taken" % (cp, a))
+    # elif not overall.get((cj, cp, a), 0) < 1:
+    #   print("%d,%d,%d already taken" % (cj, cp, a))
+    #   print(overall)
+    # else:
+    if dj.get((cj, a), 0) < k and dp.get((cp, a), 0) < k and overall.get((cj, cp, a), 0) < 1:
+      dj[(cj, a)] = dj.get((cj, a), 0) + 1
+      dp[(cp, a)] = dp.get((cp, a), 0) + 1
+      overall[(cj, cp, a)] = overall.get((cj, cp, a), 0) + 1
+      # print("Chose %d" % a)
+      ok, ret = getSs(tail, dj, dp, overall, s, k)
+      if ok:
+        ret.append(a)
+        return True, ret
+      #print("Falling back %d" % a)
+      #print("New values: %d, %d, %d" %
+            # (dj.get((cj, a), 1) - 1,
+            #  dp.get((cp, a), 1) - 1,
+            #  dp.get((cj, cp, a), 1) - 1))
+      dj[(cj, a)] = dj.get((cj, a), 1) - 1
+      dp[(cp, a)] = dp.get((cp, a), 1) - 1
+      overall[(cj, cp, a)] = overall.get((cj, cp, a), 1) - 1
+
+  #print("FAILED!")
+  return False, [77]
 
 def solve(line):
   j = int(line[0])
@@ -17,57 +55,33 @@ def solve(line):
   cj = 0
   cp = 0
   cs = 0
-  ck = 0
+
   if k < s:
+    overall = {}
     dj = {}
     dp = {}
-    djp = {}
-    overall = {}
-    output = ""
-    counter = 0
+    jpList = []
     for i in range(0, realMax):
-      counter += 1
+      jpList.append((cj, cp))
+      cp += 1
+      if cp >= p:
+        cp = 0
+        cj = (cj + 1) % j
+
+    # print(jpList)
+    ok, sList = getSs(jpList, dj, dp, overall, s, k)
+
+    if not ok:
+      print("FAILDE")
+      print(jpList)
+      print(sList)
+
+    for i in range(0, realMax):
+      cj, cp = jpList[i]
+      cs = sList[i]
       output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)
-      overall[(cj, cp, cs)] = 1
-      djp[(cj, cp)] = djp.get((cj, cp), 0) + 1
-      dj[(cj, cs)] = dj.get((cj, cs), 0) + 1
-      dp[(cp, cs)] = dp.get((cp, cs), 0) + 1
-      ck += 1
 
-      cj = 0
-      cp = 0
-      cs = 0
-
-      found = False
-      while not found and cj < j and cp < p:
-        if djp.get((cj, cp), 0) < k:
-          for a in range(0, s):
-            if dj.get((cj, a), 0) < k and dp.get((cp, a), 0) < k and not (cj, cp, a) in overall:
-              # print(dj)
-              # print(dp)
-              # print("dj(%d,%d) = %d" % (cj, a, dj.get((cj, a), 0)))
-              # print("dp(%d,%d) = %d" % (cp, a, dp.get((cp, a), 0)))
-              # print("Found: %d,%d -> %d" % (cj, cp, a))
-              cs = a
-              found = True
-              break
-        if not found:
-          cs += 1
-          if cs >= s:
-            cs = 0
-            cp += 1
-            if cp >= p:
-              cp = 0
-              cj += 1
-      if not found:
-        # print("Not found (%d,%d)" % (cj, cp))
-        # print(dj)
-        # print(dp)
-
-        return str(counter) + "\n" + output
-    #print(dj)
-    #print(dp)
-    return str(counter) + "\n" + output
+    return output
 
   for i in range(0, realMax):
     output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)

@@ -19,20 +19,44 @@ def solve(line):
   cs = 0
   ck = 0
   if k < s:
-    biais = 0
+    dj = {}
+    dp = {}
+    output = ""
+    counter = 0
     for i in range(0, realMax):
-      output += "%d %d %d\n" % (cj + 1, ((cp + biais) % p) + 1, cs + 1)
-      cs = (cs + 1) % s
+      counter += 1
+      output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)
+      dj[(cj, cs)] = dj.get((cj, cs), 0) + 1
+      dp[(cp, cs)] = dp.get((cp, cs), 0) + 1
       ck += 1
       if ck % k == 0:
-        cs = int(ck / k) % s
         cp += 1
         if cp >= p:
           cp = 0
           cj = (cj + 1) % j
-        if cs == 0:
-          biais += 1
-    return output
+
+      found = False
+      while not found and cj < j and cp < p:
+        for a in range(0, s):
+          if dj.get((cj, a), 0) < k and dp.get((cp, a), 0) < k:
+            #print(dj)
+            #print(dp)
+            #print("dj(%d,%d) = %d" % (cj, a, dj.get((cj, a), 0)))
+            #print("dp(%d,%d) = %d" % (cp, a, dp.get((cp, a), 0)))
+            #print("Found: %d,%d -> %d" % (cj, cp, a))
+            cs = a
+            found = True
+            break
+        cj += 1
+      if not found:
+        print("Not found (%d,%d)" % (cj, cp))
+        print(dj)
+        print(dp)
+
+        return str(counter) + "\n" + output
+    #print(dj)
+    #print(dp)
+    return str(counter) + "\n" + output
 
   for i in range(0, realMax):
     output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)

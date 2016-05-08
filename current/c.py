@@ -1,42 +1,4 @@
 from codejam import CodeJam, parsers
-import sys, traceback
-
-def getSs(jpList, dj, dp, overall, s, k):
-  if len(jpList) == 0:
-    return True, []
-
-  head, *tail = jpList
-  cj, cp = head
-
-  for a in range(0, s):
-    # if not dj.get((cj, a), 0) < k:
-    #   print("%d,%d already taken" % (cj, a))
-    # elif not dp.get((cp, a), 0) < k:
-    #   print("%d,%d already taken" % (cp, a))
-    # elif not overall.get((cj, cp, a), 0) < 1:
-    #   print("%d,%d,%d already taken" % (cj, cp, a))
-    #   print(overall)
-    # else:
-    if dj.get((cj, a), 0) < k and dp.get((cp, a), 0) < k and overall.get((cj, cp, a), 0) < 1:
-      dj[(cj, a)] = dj.get((cj, a), 0) + 1
-      dp[(cp, a)] = dp.get((cp, a), 0) + 1
-      overall[(cj, cp, a)] = overall.get((cj, cp, a), 0) + 1
-      # print("Chose %d" % a)
-      ok, ret = getSs(tail, dj, dp, overall, s, k)
-      if ok:
-        ret.append(a)
-        return True, ret
-      #print("Falling back %d" % a)
-      #print("New values: %d, %d, %d" %
-            # (dj.get((cj, a), 1) - 1,
-            #  dp.get((cp, a), 1) - 1,
-            #  dp.get((cj, cp, a), 1) - 1))
-      dj[(cj, a)] = dj.get((cj, a), 1) - 1
-      dp[(cp, a)] = dp.get((cp, a), 1) - 1
-      overall[(cj, cp, a)] = overall.get((cj, cp, a), 1) - 1
-
-  #print("FAILED!")
-  return False, [77]
 
 def solve(line):
   j = int(line[0])
@@ -57,29 +19,20 @@ def solve(line):
   cs = 0
 
   if k < s:
-    overall = {}
-    dj = {}
-    dp = {}
-    jpList = []
+    jbiais = 0
+    kbiais = 0
     for i in range(0, realMax):
-      jpList.append((cj, cp))
+      output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)
       cp += 1
+      cs = (cs + 1) % s
       if cp >= p:
         cp = 0
         cj = (cj + 1) % j
-
-    # print(jpList)
-    ok, sList = getSs(jpList, dj, dp, overall, s, k)
-
-    if not ok:
-      print("FAILDE")
-      print(jpList)
-      print(sList)
-
-    for i in range(0, realMax):
-      cj, cp = jpList[i]
-      cs = sList[i]
-      output += "%d %d %d\n" % (cj + 1, cp + 1, cs + 1)
+        jbiais += 1
+        if (i + 1) % (j*p) == 0:
+          jbiais = 0
+          kbiais += 1
+        cs = (kbiais + jbiais) % s
 
     return output
 

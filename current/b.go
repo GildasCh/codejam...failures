@@ -152,7 +152,7 @@ func getRanges(r int, q []int) []Range {
 
 	for i := 0; i < len(q); i++ {
 		ran := getRange(r, q[i])
-		if ran.l != -1 {
+		if ran.l > 0 {
 			ret = append(ret, ran)
 		}
 	}

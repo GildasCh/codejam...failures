@@ -56,13 +56,13 @@ func main() {
 	fmt.Println("Solving...")
 
 	for i, c := range C {
-		fmt.Println("Case", i, ":", c)
-		s, err := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0, 0)
+		fmt.Println("Case", i+1, ":", c)
+		s, _, _ := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0, 0, nil)
 		if s == -1 {
-			fmt.Println("IMPOSSIBLE", err)
+			// fmt.Println("IMPOSSIBLE", err, string(track))
 			fmt.Fprintf(output, "Case #%d: IMPOSSIBLE\n", i+1)
 		} else {
-			fmt.Println("OK", s, err)
+			// fmt.Println("OK", s, err, string(track))
 			fmt.Fprintf(output, "Case #%d: %d\n", i+1, s)
 		}
 	}
@@ -75,15 +75,15 @@ func solve(
 	Hk int,
 	Ak int,
 	B int,
-	D int, counter int, state int) (int, error) {
-	// fmt.Println(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state)
+	D int, counter int, state int, track []rune) (int, error, []rune) {
+	// fmt.Println(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state, string(track))
 
-	if counter > 1000 {
-		return -1, errors.New("Over counter")
+	if counter > 10000 {
+		return -1, errors.New("Over counter"), track
 	}
 
 	if Hk <= 0 {
-		return counter, errors.New("Knight killed, counter: " + strconv.Itoa(counter))
+		return counter, errors.New("Knight killed, counter: " + strconv.Itoa(counter)), track
 	}
 
 	if counter > 0 {
@@ -91,53 +91,55 @@ func solve(
 	}
 
 	if Hd <= 0 {
-		return -1, errors.New("Dragon killed")
+		return -1, errors.New("Dragon killed"), track
 	}
 
 	// Special case 1: Knight can be killed
 	if Ad >= Hk {
 		// Attack
-		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state)
+		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state, append(track, 'a'))
 	}
 
 	// Special case 2: Dragon must heal
 	if Ak >= Hd {
 		// Cure
-		return solve(HdInitial, HdInitial, Ad, Hk, Ak, B, D, counter+1, state)
+		return solve(HdInitial, HdInitial, Ad, Hk, Ak, B, D, counter+1, state, append(track, 'c'))
 	}
 
 	switch state {
 	case 0: // Debuff or move on
-		if Ak <= 0 {
-			Ak = 0
+		if D <= 0 || Ak <= 0 {
 			// Next state
-			return solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
+			return solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1, track)
 		}
 		// Debuff
-		d, err := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state)
+		d, errd, td := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state, append(track, 'd'))
 		// Next state
-		n, err := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
-		return min(d, n), err
+		n, errn, tn := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1, track)
+		if d == -1 || (n != -1 && n < d) {
+			return n, errn, tn
+		}
+		return d, errd, td
 	case 1: // Buff or move on
+		if B <= 0 {
+			// Next state
+			return solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1, track)
+		}
 		// Buff
-		b, err := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1, state)
+		b, errb, tb := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1, state, append(track, 'b'))
 		// Next state
-		n, err := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
-		return min(b, n), err
+		n, errn, tn := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1, track)
+		if b == -1 || (n != -1 && n < b) {
+			return n, errn, tn
+		}
+		return b, errb, tb
 	case 2: // Attack always
 		// Attack
-		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state)
+		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state, append(track, 'a'))
 	}
 
 	panic("No")
-	return -1, errors.New("NO")
-}
-
-func min(a, b int) int {
-	if a == -1 || (b != -1 && b < a) {
-		return b
-	}
-	return a
+	return -1, errors.New("NO"), track
 }
 
 func readInt() int {

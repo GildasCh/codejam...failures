@@ -54,7 +54,7 @@ func main() {
 	fmt.Println("Solving...")
 
 	for i, c := range C {
-		s := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0)
+		s := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0, 0)
 		if s == -1 {
 			fmt.Fprintf(output, "Case #%d: IMPOSSIBLE\n", i+1)
 		} else {
@@ -70,9 +70,9 @@ func solve(
 	Hk int,
 	Ak int,
 	B int,
-	D int, counter int) int {
+	D int, counter int, state int) int {
 
-	if counter > 15 {
+	if counter > 40 {
 		return -1
 	}
 
@@ -88,30 +88,45 @@ func solve(
 		return -1
 	}
 
-	// Attack
-	a := solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1)
-	// Buff
-	b := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1)
-	// Cure
-	c := solve(HdInitial, HdInitial, Ad, Hk, Ak, B, D, counter+1)
-	// Debuff
-	d := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1)
+	// Special case 1: Knight can be killed
+	if Ad >= Hk {
+		// Attack
+		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state)
+	}
 
-	return min(a, b, c, d)
+	// Special case 2: Dragon must heal
+	if Ak >= Hd {
+		// Cure
+		return solve(HdInitial, HdInitial, Ad, Hk, Ak, B, D, counter+1, state)
+	}
+
+	switch state {
+	case 0: // Debuff or move on
+		// Debuff
+		d := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state)
+		// Next state
+		n := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state+1)
+		return min(d, n)
+	case 1: // Buff or move on
+		// Buff
+		b := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1, state)
+		// Next state
+		n := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state+1)
+		return min(b, n)
+	case 2: // Attack always
+		// Attack
+		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state)
+	}
+
+	panic("No")
+	return -1
 }
 
-func min(a, b, c, d int) int {
-	ret := a
-	if b != -1 && (ret == -1 || b < ret) {
-		ret = b
+func min(a, b int) int {
+	if b != -1 && b < a {
+		return b
 	}
-	if c != -1 && (ret == -1 || c < ret) {
-		ret = c
-	}
-	if d != -1 && (ret == -1 || d < ret) {
-		ret = d
-	}
-	return ret
+	return a
 }
 
 func readInt() int {

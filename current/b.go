@@ -122,7 +122,7 @@ func analyse(R []Range) (bool, int) {
 		}
 	}
 
-	if highestLower <= smallestUpper {
+	if highestLower <= smallestUpper && highestLower > 0 {
 		// fmt.Println(R, "Working!")
 		return true, -1
 	}

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 var input *os.File
@@ -54,10 +56,13 @@ func main() {
 	fmt.Println("Solving...")
 
 	for i, c := range C {
-		s := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0, 0)
+		fmt.Println("Case", i, ":", c)
+		s, err := solve(c.Hd, c.Hd, c.Ad, c.Hk, c.Ak, c.B, c.D, 0, 0)
 		if s == -1 {
+			fmt.Println("IMPOSSIBLE", err)
 			fmt.Fprintf(output, "Case #%d: IMPOSSIBLE\n", i+1)
 		} else {
+			fmt.Println("OK", s, err)
 			fmt.Fprintf(output, "Case #%d: %d\n", i+1, s)
 		}
 	}
@@ -70,14 +75,15 @@ func solve(
 	Hk int,
 	Ak int,
 	B int,
-	D int, counter int, state int) int {
+	D int, counter int, state int) (int, error) {
+	// fmt.Println(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state)
 
-	if counter > 40 {
-		return -1
+	if counter > 1000 {
+		return -1, errors.New("Over counter")
 	}
 
 	if Hk <= 0 {
-		return counter
+		return counter, errors.New("Knight killed, counter: " + strconv.Itoa(counter))
 	}
 
 	if counter > 0 {
@@ -85,7 +91,7 @@ func solve(
 	}
 
 	if Hd <= 0 {
-		return -1
+		return -1, errors.New("Dragon killed")
 	}
 
 	// Special case 1: Knight can be killed
@@ -102,28 +108,33 @@ func solve(
 
 	switch state {
 	case 0: // Debuff or move on
+		if Ak <= 0 {
+			Ak = 0
+			// Next state
+			return solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
+		}
 		// Debuff
-		d := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state)
+		d, err := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state)
 		// Next state
-		n := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state+1)
-		return min(d, n)
+		n, err := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
+		return min(d, n), err
 	case 1: // Buff or move on
 		// Buff
-		b := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1, state)
+		b, err := solve(HdInitial, Hd, Ad+B, Hk, Ak, B, D, counter+1, state)
 		// Next state
-		n := solve(HdInitial, Hd, Ad, Hk, Ak-D, B, D, counter+1, state+1)
-		return min(b, n)
+		n, err := solve(HdInitial, Hd, Ad, Hk, Ak, B, D, counter, state+1)
+		return min(b, n), err
 	case 2: // Attack always
 		// Attack
 		return solve(HdInitial, Hd, Ad, Hk-Ad, Ak, B, D, counter+1, state)
 	}
 
 	panic("No")
-	return -1
+	return -1, errors.New("NO")
 }
 
 func min(a, b int) int {
-	if b != -1 && b < a {
+	if a == -1 || (b != -1 && b < a) {
 		return b
 	}
 	return a

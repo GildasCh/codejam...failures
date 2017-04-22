@@ -117,11 +117,13 @@ func solve(N, R, O, Y, G, B, V int) string {
 				if totals[compo] > 0 {
 					ret[i] = compo
 					p[1]--
-					totals[compo]++
-					totals[inplace]--
+					totals[compo]--
+					totals[inplace]++
 				}
 			}
 		}
+
+		fmt.Println(string(curr), "done:", string(ret))
 
 		if p[1] > 0 {
 			fmt.Println("IMPOSSIBLE:" + string(ret))
@@ -133,25 +135,16 @@ func solve(N, R, O, Y, G, B, V int) string {
 }
 
 func spot(k int, N int) int {
-	if k == 0 {
+	if N == 1 {
 		return 0
 	}
 
-	prev := prevPowerOfTwo(k)
-	flag := N / (2 * prev)
-	if flag == 0 {
-		return 1 + spot(prev/2+(k-prev), N)
-	}
-	return (1 + 2*(k-prev)) * flag
-}
+	odd := k % 2
 
-func prevPowerOfTwo(v int) int {
-	ret := 1
-	for v>>1 > 0 {
-		v = v >> 1
-		ret *= 2
+	if odd == 0 {
+		return spot(k/2, N-N/2)
 	}
-	return ret
+	return (N - N/2) + spot(k/2, N/2)
 }
 
 func compose(a, b rune) rune {
@@ -207,7 +200,7 @@ type ByN [][]int
 
 func (a ByN) Len() int           { return len(a) }
 func (a ByN) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByN) Less(i, j int) bool { return a[i][1] < a[j][1] }
+func (a ByN) Less(i, j int) bool { return a[i][1] > a[j][1] }
 
 func readInt() int {
 	var i int

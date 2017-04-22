@@ -92,14 +92,23 @@ func solve(N, R, O, Y, G, B, V int) string {
 		}
 
 		// we need to place p[1] unicorns
-		for i := 0; i < N; i++ {
+		for k := 0; k < N; k++ {
+			i := spot(k, N)
+			fmt.Println("spot", k, N, "=", i)
+
 			if p[1] <= 0 {
 				break
 			}
 
+			left := ret[(i-1+N)%N]
+			right := ret[(i+1)%N]
+
+			if conflicts(curr, left) || conflicts(curr, right) {
+				continue
+			}
+
 			if ret[i] == rune(0) {
 				ret[i] = curr
-				i += bias // i increments twice
 				p[1]--
 				totals[curr]--
 			} else {
@@ -107,7 +116,6 @@ func solve(N, R, O, Y, G, B, V int) string {
 				compo := compose(curr, inplace)
 				if totals[compo] > 0 {
 					ret[i] = compo
-					i += bias // i increments twice
 					p[1]--
 					totals[compo]++
 					totals[inplace]--
@@ -122,6 +130,28 @@ func solve(N, R, O, Y, G, B, V int) string {
 	}
 
 	return string(ret)
+}
+
+func spot(k int, N int) int {
+	if k == 0 {
+		return 0
+	}
+
+	prev := prevPowerOfTwo(k)
+	flag := N / (2 * prev)
+	if flag == 0 {
+		return 1 + spot(prev/2+(k-prev), N)
+	}
+	return (1 + 2*(k-prev)) * flag
+}
+
+func prevPowerOfTwo(v int) int {
+	ret := 1
+	for v>>1 > 0 {
+		v = v >> 1
+		ret *= 2
+	}
+	return ret
 }
 
 func compose(a, b rune) rune {
@@ -150,6 +180,27 @@ func compose(a, b rune) rune {
 	}
 
 	return rune(0)
+}
+
+func conflicts(a, b rune) bool {
+	if a == rune(0) || b == rune(0) {
+		return false
+	}
+
+	if a == b {
+		return true
+	}
+
+	switch b {
+	case 'O':
+		return a == 'R' || a == 'Y'
+	case 'G':
+		return a == 'B' || a == 'Y'
+	case 'V':
+		return a == 'R' || a == 'B'
+	}
+
+	return false
 }
 
 type ByN [][]int

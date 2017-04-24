@@ -65,14 +65,14 @@ func solve(N, R, O, Y, G, B, V int) string {
 	// fmt.Println(R, C, L)
 	ret := make([]rune, N)
 
-	totals := map[rune]int{
-		'R': R,
-		'O': O,
-		'Y': Y,
-		'G': G,
-		'B': B,
-		'V': V,
-	}
+	// totals := map[rune]int{
+	// 	'R': R,
+	// 	'O': O,
+	// 	'Y': Y,
+	// 	'G': G,
+	// 	'B': B,
+	// 	'V': V,
+	// }
 
 	prims := [][]int{
 		[]int{0, R + O + V},
@@ -92,38 +92,26 @@ func solve(N, R, O, Y, G, B, V int) string {
 		}
 
 		// we need to place p[1] unicorns
+		justPlaced := false
 		for k := 0; k < N; k++ {
-			i := spot(k, N)
-			fmt.Println("spot", k, N, "=", i)
-
 			if p[1] <= 0 {
 				break
 			}
 
-			left := ret[(i-1+N)%N]
-			right := ret[(i+1)%N]
-
-			if conflicts(curr, left) || conflicts(curr, right) {
+			// There's someone
+			if ret[k] != rune(0) {
 				continue
 			}
 
-			if ret[i] == rune(0) {
-				ret[i] = curr
-				p[1]--
-				totals[curr]--
-			} else {
-				inplace := ret[i]
-				compo := compose(curr, inplace)
-				if totals[compo] > 0 {
-					ret[i] = compo
-					p[1]--
-					totals[compo]--
-					totals[inplace]++
-				}
+			// Empty, Skip one
+			if justPlaced == true {
+				justPlaced = false
+				continue
 			}
-		}
 
-		fmt.Println(string(curr), "done:", string(ret))
+			ret[k] = curr
+			justPlaced = true
+		}
 
 		if p[1] > 0 {
 			fmt.Println("IMPOSSIBLE:" + string(ret))
@@ -132,19 +120,6 @@ func solve(N, R, O, Y, G, B, V int) string {
 	}
 
 	return string(ret)
-}
-
-func spot(k int, N int) int {
-	if N == 1 {
-		return 0
-	}
-
-	odd := k % 2
-
-	if odd == 0 {
-		return spot(k/2, N-N/2)
-	}
-	return (N - N/2) + spot(k/2, N/2)
 }
 
 func compose(a, b rune) rune {

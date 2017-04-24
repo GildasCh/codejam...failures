@@ -63,59 +63,40 @@ func main() {
 
 func solve(N, R, O, Y, G, B, V int) string {
 	// fmt.Println(R, C, L)
-	ret := make([]rune, N)
-
-	// totals := map[rune]int{
-	// 	'R': R,
-	// 	'O': O,
-	// 	'Y': Y,
-	// 	'G': G,
-	// 	'B': B,
-	// 	'V': V,
-	// }
-
 	prims := [][]int{
-		[]int{0, R + O + V},
-		[]int{1, Y + O + G},
-		[]int{2, B + G + V}}
+		[]int{int('R'), R + O + V},
+		[]int{int('Y'), Y + O + G},
+		[]int{int('B'), B + G + V}}
 	sort.Sort(ByN(prims))
 
-	for _, p := range prims {
-		curr := '0'
-		switch p[0] {
-		case 0: // R
-			curr = 'R'
-		case 1: // Y
-			curr = 'Y'
-		case 2: // B
-			curr = 'B'
+	if prims[0][1] > N/2 {
+		return "IMPOSSIBLE"
+	}
+
+	ret := make([]rune, N)
+
+	// Place most frequent
+	i := 0
+	for prims[0][1] > 0 {
+		ret[i] = rune(prims[0][0])
+		prims[0][1]--
+		i += 2
+	}
+
+	// Place others
+	swit := false
+	for i := 0; i < N; i++ {
+		if ret[i] != rune(0) {
+			continue
 		}
-
-		// we need to place p[1] unicorns
-		justPlaced := false
-		for k := 0; k < N; k++ {
-			if p[1] <= 0 {
-				break
-			}
-
-			// There's someone
-			if ret[k] != rune(0) {
-				continue
-			}
-
-			// Empty, Skip one
-			if justPlaced == true {
-				justPlaced = false
-				continue
-			}
-
-			ret[k] = curr
-			justPlaced = true
-		}
-
-		if p[1] > 0 {
-			fmt.Println("IMPOSSIBLE:" + string(ret))
-			return "IMPOSSIBLE"
+		if swit {
+			ret[i] = rune(prims[2][0])
+			prims[2][1]--
+			swit = false
+		} else {
+			ret[i] = rune(prims[1][0])
+			prims[1][1]--
+			swit = true
 		}
 	}
 

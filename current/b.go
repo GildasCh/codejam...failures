@@ -85,19 +85,23 @@ func solve(N, R, O, Y, G, B, V int) string {
 
 	// Place others
 	swit := false
-	for i := 0; i < N; i++ {
+	for i := N-1; i >=0; i-- {
 		if ret[i] != rune(0) {
 			continue
 		}
-		if swit {
-			ret[i] = rune(prims[2][0])
-			prims[2][1]--
-			swit = false
-		} else {
+		if swit || prims[2][1] <= 0 {
 			ret[i] = rune(prims[1][0])
 			prims[1][1]--
+			swit = false
+		} else {
+			ret[i] = rune(prims[2][0])
+			prims[2][1]--
 			swit = true
 		}
+	}
+
+	if prims[1][1] > 0 || prims[2][1] > 0 {
+		fmt.Println("Problem:", prims[1][1], prims[2][1], string(ret), N, R, O, Y, G, B, V)
 	}
 
 	return string(ret)

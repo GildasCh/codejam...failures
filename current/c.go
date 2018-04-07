@@ -21,7 +21,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "test case %d: a=%d\n", i, a)
 
 		h := int(math.Ceil(math.Sqrt(float64(a))))
-		w := int(math.Ceil(math.Sqrt(float64(a))))
+		w := int(math.Ceil(float64(a) / float64(h)))
 
 		x, y := 2, 2
 		for {

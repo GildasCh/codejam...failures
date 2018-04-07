@@ -63,7 +63,27 @@ func solve(D int, P string) (int, bool) {
 		return -1, false
 	}
 
-	return 0, true
+	n := 0
+
+	for power(P) > D {
+		P = swap(P)
+		n++
+	}
+
+	return n, true
+}
+
+func swap(P string) string {
+	program := []byte(P)
+
+	for i := len(program) - 2; i >= 0; i-- {
+		if program[i] == 'C' && program[i+1] == 'S' {
+			program[i], program[i+1] = program[i+1], program[i]
+			return string(program)
+		}
+	}
+
+	return "PROUT"
 }
 
 func power(P string) int {

@@ -18,22 +18,6 @@ type Case struct {
 }
 
 func main() {
-	sample := os.Args[1]
-	fileIn := sample + ".in"
-	fileOut := sample + ".out"
-
-	var err error
-	input, err = os.Open(fileIn)
-	if err != nil {
-		panic(fmt.Sprintf("open %s: %v", fileIn, err))
-	}
-	output, err = os.Create(fileOut)
-	if err != nil {
-		panic(fmt.Sprintf("creating %s: %v", fileOut, err))
-	}
-	defer input.Close()
-	defer output.Close()
-
 	T = readInt()
 
 	for i := 0; i < T; i++ {
@@ -46,24 +30,24 @@ func main() {
 		C = append(C, c)
 	}
 
-	fmt.Println("Solving...")
+	fmt.Fprintf(os.Stderr, "Solving...")
 
 	for i, c := range C {
-		fmt.Printf("Case #%d\n", i+1)
+		fmt.Fprintf(os.Stderr, "Case #%d\n", i+1)
 		res, ok := solve(c.N, c.V)
 		if ok {
-			fmt.Fprintf(output, "Case #%d: OK\n", i+1)
+			fmt.Printf("Case #%d: OK\n", i+1)
 		} else {
-			fmt.Fprintf(output, "Case #%d: %d\n", i+1, res)
+			fmt.Printf("Case #%d: %d\n", i+1, res)
 		}
 	}
 }
 
 func solve(D int, V []int) (int, bool) {
-	fmt.Printf("solving %d %v\n", D, V)
+	fmt.Fprintf(os.Stderr, "solving %d %v\n", D, V)
 
 	V = trouble(V)
-	fmt.Printf("after trouble %v\n", V)
+	fmt.Fprintf(os.Stderr, "after trouble %v\n", V)
 
 	for i := 0; i < len(V)-1; i++ {
 		if V[i] > V[i+1] {
@@ -118,24 +102,12 @@ func (a EvenSort) Less(i, j int) bool {
 
 func readInt() int {
 	var i int
-	fmt.Fscanf(input, "%d", &i)
+	fmt.Fscanf(os.Stdin, "%d", &i)
 	return i
 }
 
 func readString() string {
 	var str string
-	fmt.Fscanf(input, "%s", &str)
+	fmt.Fscanf(os.Stdin, "%s", &str)
 	return str
-}
-
-func readFloat() float64 {
-	var x float64
-	fmt.Fscanf(input, "%f", &x)
-	return x
-}
-
-func readRune() rune {
-	var x rune
-	fmt.Fscanf(input, "%c", &x)
-	return x
 }

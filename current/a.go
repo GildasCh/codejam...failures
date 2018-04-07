@@ -17,22 +17,6 @@ type Case struct {
 }
 
 func main() {
-	sample := os.Args[1]
-	fileIn := sample + ".in"
-	fileOut := sample + ".out"
-
-	var err error
-	input, err = os.Open(fileIn)
-	if err != nil {
-		panic(fmt.Sprintf("open %s: %v", fileIn, err))
-	}
-	output, err = os.Create(fileOut)
-	if err != nil {
-		panic(fmt.Sprintf("creating %s: %v", fileOut, err))
-	}
-	defer input.Close()
-	defer output.Close()
-
 	T = readInt()
 
 	for i := 0; i < T; i++ {
@@ -42,22 +26,22 @@ func main() {
 		C = append(C, c)
 	}
 
-	fmt.Println("Solving...")
+	fmt.Fprintf(os.Stderr, "Solving...\n")
 
 	for i, c := range C {
-		fmt.Printf("Case #%d\n", i+1)
+		fmt.Fprintf(os.Stderr, "Case #%d\n", i+1)
 		res, ok := solve(c.D, c.P)
 		if !ok {
-			fmt.Fprintf(output, "Case #%d: IMPOSSIBLE\n", i+1)
+			fmt.Printf("Case #%d: IMPOSSIBLE\n", i+1)
 		} else {
-			fmt.Fprintf(output, "Case #%d: %d\n", i+1, res)
+			fmt.Printf("Case #%d: %d\n", i+1, res)
 		}
 	}
 }
 
 func solve(D int, P string) (int, bool) {
-	fmt.Printf("solving %d %q\n", D, P)
-	fmt.Println("power:", power(P))
+	fmt.Fprintf(os.Stderr, "solving %d %q\n", D, P)
+	fmt.Fprintf(os.Stderr, "power: %q\n", power(P))
 
 	if D < numberOfS(P) {
 		return -1, false
@@ -116,24 +100,12 @@ func numberOfS(P string) int {
 
 func readInt() int {
 	var i int
-	fmt.Fscanf(input, "%d", &i)
+	fmt.Fscanf(os.Stdin, "%d", &i)
 	return i
 }
 
 func readString() string {
 	var str string
-	fmt.Fscanf(input, "%s", &str)
+	fmt.Fscanf(os.Stdin, "%s", &str)
 	return str
-}
-
-func readFloat() float64 {
-	var x float64
-	fmt.Fscanf(input, "%f", &x)
-	return x
-}
-
-func readRune() rune {
-	var x rune
-	fmt.Fscanf(input, "%c", &x)
-	return x
 }

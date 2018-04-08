@@ -44,10 +44,10 @@ func main() {
 }
 
 func solve(D int, V []int) (int, bool) {
-	fmt.Fprintf(os.Stderr, "solving %d %v\n", D, V)
+	// fmt.Fprintf(os.Stderr, "solving %d %v\n", D, V)
 
 	V = trouble(V)
-	fmt.Fprintf(os.Stderr, "after trouble %v\n", V)
+	// fmt.Fprintf(os.Stderr, "after trouble %v\n", V)
 
 	for i := 0; i < len(V)-1; i++ {
 		if V[i] > V[i+1] {

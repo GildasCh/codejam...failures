@@ -39,11 +39,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Case #%d\n", i+1)
 		fmt.Fprintf(os.Stderr, "Case #%v\n", c)
 		res := solve(c.N, c.P, c.H, c.W)
-		fmt.Printf("Case #%d: %s\n", i+1, res)
+		fmt.Printf("Case #%d: %f\n", i+1, res)
 	}
 }
 
-func solve(N, P int, H, W []int) string {
+func solve(N, P int, H, W []int) float64 {
 	// Starting point
 	start := 0
 	for i := 0; i < N; i++ {
@@ -63,7 +63,23 @@ func solve(N, P int, H, W []int) string {
 
 	fmt.Fprintf(os.Stderr, "All possible intervals: %v\n", ivs.a)
 
-	return "IMPOSSIBLE"
+	// Find closest
+	fP := float64(P)
+	closest := float64(start)
+	for _, ii := range ivs.a {
+		if ii.L < fP && fP < ii.H {
+			return fP
+		}
+
+		if math.Abs(fP-ii.L) < math.Abs(fP-closest) {
+			closest = ii.L
+		}
+		if math.Abs(fP-ii.H) < math.Abs(fP-closest) {
+			closest = ii.H
+		}
+	}
+
+	return closest
 }
 
 func minCut(a, b int) float64 {

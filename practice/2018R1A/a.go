@@ -44,7 +44,79 @@ func main() {
 }
 
 func solve(R, C, H, V int, Chips [][]bool) string {
+	if solveRec(R, C, H, V, Chips) {
+		return "POSSIBLE"
+	}
 	return "IMPOSSIBLE"
+}
+
+func solveRec(R, C, H, V int, Chips [][]bool) bool {
+	fmt.Fprintf(os.Stderr, "solveRec %v %v %v %v\n", R, C, H, V)
+
+	if H == 0 && V == 0 {
+		return true
+	}
+
+	NChips := count(Chips, R, C)
+
+	if NChips == 0 {
+		return true
+	}
+
+	divs := (H + 1) * (V + 1)
+	if NChips%divs != 0 {
+		return false
+	}
+	target := NChips / divs
+	fmt.Fprintf(os.Stderr, "target: %d\n", target)
+
+	h, v := 1, 1
+	for {
+		if count(Chips, h, C) > target*(H+1) ||
+			count(Chips, R, v) > target*(V+1) ||
+			count(Chips, h, v) > target {
+			return false
+		}
+
+		if count(Chips, h, C) < target*(H+1) {
+			h++
+			continue
+		}
+		if count(Chips, R, v) < target*(V+1) {
+			v++
+			continue
+		}
+
+		break
+	}
+
+	fmt.Fprintf(os.Stderr,
+		"cutting at %d,%d; counts %d, %d, %d\n",
+		h, v, count(Chips, h, v), count(Chips, h, C), count(Chips, R, v),
+	)
+
+	if count(Chips, h, v) != target {
+		return false
+	}
+
+	Chips = Chips[h:]
+	for i := 0; i < R-h; i++ {
+		Chips[i] = Chips[i][v:]
+	}
+
+	return solveRec(R-h, C-v, H-1, V-1, Chips)
+}
+
+func count(Chips [][]bool, r, c int) int {
+	NChips := 0
+	for i := 0; i < r; i++ {
+		for j := 0; j < c; j++ {
+			if Chips[i][j] {
+				NChips++
+			}
+		}
+	}
+	return NChips
 }
 
 func readInt() int {

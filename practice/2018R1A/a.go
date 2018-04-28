@@ -57,77 +57,78 @@ func solveRec(R, C, H, V int, Chips [][]bool) bool {
 		return true
 	}
 
-	NChips := count(Chips, R, C)
+	NChips := count(Chips, 0, 0, R, C)
 
 	if NChips == 0 {
 		return true
 	}
 
 	divs := (H + 1) * (V + 1)
-	if NChips%divs != 0 {
+	if NChips%divs != 0 || NChips%(H+1) != 0 || NChips%(V+1) != 0 {
 		return false
 	}
 	target := NChips / divs
+	hTarget := NChips / (H + 1)
+	vTarget := NChips / (V + 1)
 	fmt.Fprintf(os.Stderr, "target: %d\n", target)
 
-	h, v := 0, 0
-
-	if H > 0 {
-		hTarget := target * (V + 1)
-		for count(Chips, h, C) < hTarget {
-			h++
+	// H divs
+	h1, h2 := 0, 0
+	hCuts := []int{0}
+	for len(hCuts) < H+1 {
+		for count(Chips, h1, 0, h2, C) < hTarget {
+			h2++
 		}
 
-		if count(Chips, h, C) != hTarget {
+		if count(Chips, h1, 0, h2, C) != hTarget {
 			return false
 		}
+
+		hCuts = append(hCuts, h2)
+		h1 = h2
 	}
 
-	if V > 0 {
-		vTarget := target * (H + 1)
-		for count(Chips, R, v) < vTarget {
-			v++
+	// V divs
+	v1, v2 := 0, 0
+	vCuts := []int{0}
+	for len(vCuts) < V+1 {
+		for count(Chips, 0, v1, R, v2) < vTarget {
+			v2++
 		}
 
-		if count(Chips, R, v) != vTarget {
+		if count(Chips, 0, v1, R, v2) != vTarget {
 			return false
 		}
+
+		vCuts = append(vCuts, v2)
+		v1 = v2
 	}
 
-	if h != 0 && v != 0 {
-		if count(Chips, h, v) != target {
-			return false
+	fmt.Fprintf(os.Stderr, "cutting at %v,%v\n", hCuts, vCuts)
+
+	// Verify solution
+	for i := 0; i < H; i++ {
+		for j := 0; j < V; j++ {
+			if count(Chips, hCuts[i], vCuts[j], hCuts[i+1], vCuts[j+1]) != target {
+				return false
+			}
 		}
 	}
 
-	fmt.Fprintf(os.Stderr,
-		"cutting at %d,%d; counts %d, %d, %d\n",
-		h, v, count(Chips, h, v), count(Chips, h, C), count(Chips, R, v),
-	)
-
-	Chips = Chips[h:]
-	for i := 0; i < R-h; i++ {
-		Chips[i] = Chips[i][v:]
-	}
-
-	if H > 0 {
-		H--
-	}
-	if V > 0 {
-		V--
-	}
-	return solveRec(R-h, C-v, H, V, Chips)
+	return true
 }
 
-func count(Chips [][]bool, r, c int) int {
+func count(Chips [][]bool, r1, c1, r2, c2 int) int {
 	NChips := 0
-	for i := 0; i < r; i++ {
-		for j := 0; j < c; j++ {
+	for i := r1; i < r2; i++ {
+		for j := c1; j < c2; j++ {
 			if Chips[i][j] {
 				NChips++
 			}
 		}
 	}
+
+	// fmt.Fprintf(os.Stderr, "cut(%d,%d,%d,%d) = %d\n", r1, c1, r2, c2, NChips)
 	return NChips
 }
 

@@ -71,6 +71,12 @@ func solveRec(R, C, H, V int, Chips [][]bool) bool {
 	fmt.Fprintf(os.Stderr, "target: %d\n", target)
 
 	h, v := 1, 1
+	if H == 0 {
+		h = 0
+	}
+	if V == 0 {
+		v = 0
+	}
 	for {
 		if count(Chips, h, C) > target*(H+1) ||
 			count(Chips, R, v) > target*(V+1) ||
@@ -78,13 +84,18 @@ func solveRec(R, C, H, V int, Chips [][]bool) bool {
 			return false
 		}
 
-		if count(Chips, h, C) < target*(H+1) {
-			h++
-			continue
+		if H > 0 {
+			if count(Chips, h, C) < target*(H+1) {
+				h++
+				continue
+			}
 		}
-		if count(Chips, R, v) < target*(V+1) {
-			v++
-			continue
+
+		if V > 0 {
+			if count(Chips, R, v) < target*(V+1) {
+				v++
+				continue
+			}
 		}
 
 		break
@@ -104,7 +115,13 @@ func solveRec(R, C, H, V int, Chips [][]bool) bool {
 		Chips[i] = Chips[i][v:]
 	}
 
-	return solveRec(R-h, C-v, H-1, V-1, Chips)
+	if H > 0 {
+		H--
+	}
+	if V > 0 {
+		V--
+	}
+	return solveRec(R-h, C-v, H, V, Chips)
 }
 
 func count(Chips [][]bool, r, c int) int {

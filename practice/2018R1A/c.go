@@ -67,7 +67,7 @@ func solve(N, P int, H, W []int) float64 {
 	fP := float64(P)
 	closest := float64(start)
 	for _, ii := range ivs.a {
-		if ii.L < fP && fP < ii.H {
+		if ii.L <= fP && fP <= ii.H {
 			return fP
 		}
 

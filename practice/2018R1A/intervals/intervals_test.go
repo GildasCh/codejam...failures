@@ -57,3 +57,27 @@ func TestAddToAll(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+func TestSortAndMerge(t *testing.T) {
+	actual := &Intervals{
+		a: []Interval{
+			Interval{L: -1, H: 1},
+			Interval{L: 70, H: 71},
+			Interval{L: 10, H: 70},
+			Interval{L: 70, H: 71},
+			Interval{L: 192, H: 193},
+			Interval{L: -192, H: -191},
+			Interval{L: 1234, H: 33322}}}
+
+	actual.SortAndMerge()
+
+	expected := &Intervals{
+		a: []Interval{
+			Interval{L: -192, H: -191},
+			Interval{L: -1, H: 1},
+			Interval{L: 10, H: 71},
+			Interval{L: 192, H: 193},
+			Interval{L: 1234, H: 33322}}}
+
+	assert.Equal(t, expected, actual)
+}

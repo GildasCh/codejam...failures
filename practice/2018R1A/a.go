@@ -70,45 +70,40 @@ func solveRec(R, C, H, V int, Chips [][]bool) bool {
 	target := NChips / divs
 	fmt.Fprintf(os.Stderr, "target: %d\n", target)
 
-	h, v := 1, 1
-	if H == 0 {
-		h = 0
-	}
-	if V == 0 {
-		v = 0
-	}
-	for {
-		if count(Chips, h, C) > target*(H+1) ||
-			count(Chips, R, v) > target*(V+1) ||
-			count(Chips, h, v) > target {
+	h, v := 0, 0
+
+	if H > 0 {
+		hTarget := target * (V + 1)
+		for count(Chips, h, C) < hTarget {
+			h++
+		}
+
+		if count(Chips, h, C) != hTarget {
 			return false
 		}
+	}
 
-		if H > 0 {
-			if count(Chips, h, C) < target*(H+1) {
-				h++
-				continue
-			}
+	if V > 0 {
+		vTarget := target * (H + 1)
+		for count(Chips, R, v) < vTarget {
+			v++
 		}
 
-		if V > 0 {
-			if count(Chips, R, v) < target*(V+1) {
-				v++
-				continue
-			}
+		if count(Chips, R, v) != vTarget {
+			return false
 		}
+	}
 
-		break
+	if h != 0 && v != 0 {
+		if count(Chips, h, v) != target {
+			return false
+		}
 	}
 
 	fmt.Fprintf(os.Stderr,
 		"cutting at %d,%d; counts %d, %d, %d\n",
 		h, v, count(Chips, h, v), count(Chips, h, C), count(Chips, R, v),
 	)
-
-	if count(Chips, h, v) != target {
-		return false
-	}
 
 	Chips = Chips[h:]
 	for i := 0; i < R-h; i++ {

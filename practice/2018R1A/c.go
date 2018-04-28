@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"sort"
 )
@@ -43,8 +44,37 @@ func main() {
 }
 
 func solve(N, P int, H, W []int) string {
-	//
+	// Starting point
+	start := 0
+	for i := 0; i < N; i++ {
+		start += 2*H[i] + 2*W[i]
+	}
+
+	ivs := &Intervals{}
+	ivs.Add(float64(start), float64(start))
+
+	// Add more intervals for each potential cut
+	for i := 0; i < N; i++ {
+		ivs.AddToAll(
+			minCut(H[i], W[i]),
+			maxCut(H[i], W[i]),
+		)
+	}
+
+	fmt.Fprintf(os.Stderr, "All possible intervals: %v\n", ivs.a)
+
 	return "IMPOSSIBLE"
+}
+
+func minCut(a, b int) float64 {
+	if a < b {
+		return 2 * float64(a)
+	}
+	return 2 * float64(b)
+}
+
+func maxCut(a, b int) float64 {
+	return 2 * math.Sqrt(float64(a*a+b*b))
 }
 
 type Intervals struct {
@@ -57,6 +87,22 @@ type Interval struct {
 
 func (i *Intervals) Add(l, h float64) {
 	i.a = append(i.a, Interval{l, h})
+
+	i.SortAndMerge()
+}
+
+func (i *Intervals) AddToAll(l, h float64) {
+	toAdd := []Interval{}
+	for k := 0; k < len(i.a); k++ {
+		toAdd = append(toAdd, Interval{
+			L: i.a[k].L + l,
+			H: i.a[k].H + h,
+		})
+	}
+
+	for _, ii := range toAdd {
+		i.a = append(i.a, ii)
+	}
 
 	i.SortAndMerge()
 }

@@ -16,6 +16,22 @@ func (i *Intervals) Add(l, h float64) {
 	i.SortAndMerge()
 }
 
+func (i *Intervals) AddToAll(l, h float64) {
+	toAdd := []Interval{}
+	for k := 0; k < len(i.a); k++ {
+		toAdd = append(toAdd, Interval{
+			L: i.a[k].L + l,
+			H: i.a[k].H + h,
+		})
+	}
+
+	for _, ii := range toAdd {
+		i.a = append(i.a, ii)
+	}
+
+	i.SortAndMerge()
+}
+
 func (i *Intervals) SortAndMerge() {
 	sort.Slice(i.a, func(a, b int) bool {
 		return i.a[a].L < i.a[b].L

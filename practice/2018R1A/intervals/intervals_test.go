@@ -33,3 +33,27 @@ func TestAdd(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+func TestAddToAll(t *testing.T) {
+	actual := &Intervals{
+		a: []Interval{
+			Interval{L: -192, H: -191},
+			Interval{L: -1, H: 1},
+			Interval{L: 10, H: 70},
+			Interval{L: 192, H: 193},
+			Interval{L: 1234, H: 33322}}}
+
+	actual.AddToAll(10, 20)
+
+	expected := &Intervals{
+		a: []Interval{
+			Interval{L: -192, H: -191},
+			Interval{L: -182, H: -171},
+			Interval{L: -1, H: 1},
+			Interval{L: 9, H: 90},
+			Interval{L: 192, H: 193},
+			Interval{L: 202, H: 213},
+			Interval{L: 1234, H: 33342}}}
+
+	assert.Equal(t, expected, actual)
+}

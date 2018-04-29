@@ -46,6 +46,8 @@ func solve(N, L int, C []int) int {
 	toAdd := 1
 	for {
 	start:
+		fmt.Fprintf(os.Stderr, "current score: %v (score: %d)\n", C, goods(N, C))
+
 		if N < voted+toAdd {
 			C[0] += toAdd - 1
 			fmt.Fprintf(os.Stderr, "final conf: %v (score: %d)\n", C, score(N, C))
@@ -57,7 +59,7 @@ func solve(N, L int, C []int) int {
 			if goods(N, C) > current {
 				fmt.Fprintf(os.Stderr, "found better: %v (score: %d)\n", C, goods(N, C))
 				current = goods(N, C)
-				voted++
+				voted += toAdd
 				toAdd = 1
 				goto start
 			}
@@ -69,7 +71,7 @@ func solve(N, L int, C []int) int {
 			C = C2
 			fmt.Fprintf(os.Stderr, "found better: %v (score: %d)\n", C, goods(N, C))
 			current = goods(N, C2)
-			voted++
+			voted += toAdd
 			toAdd = 1
 			goto start
 		}

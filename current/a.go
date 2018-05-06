@@ -49,9 +49,9 @@ func solve(N int, L int, W []string) string {
 			letters[rune(W[j][i])] = letters[rune(W[j][i])] + 1
 		}
 
-		if len(letters)*len(letters) < N {
-			continue
-		}
+		// if len(letters)*len(letters) < N {
+		// 	continue
+		// }
 
 		rarest := '-'
 		rCount := -1
